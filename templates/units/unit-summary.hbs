@@ -1,12 +1,28 @@
 <div class="axona-parchment">
 <div class="axona-frame axona-unit-summary">
   <header class="axona-header">
-    <img src="{{document.img}}" alt="" data-edit="img" data-action="editImage">
+    <div class="axona-portrait-stack">
+      <div class="axona-unit-portrait">
+        <img src="{{document.img}}" alt="" data-edit="img" data-action="editImage">
+      </div>
+      <div class="axona-hp-under-portrait">
+        <div class="axona-resource-bar axona-hp-bar" role="progressbar" aria-label="HP" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{hpPercent}}">
+          <span style="width: {{hpPercent}}%; background: {{hpColor}}"></span>
+        </div>
+      </div>
+    </div>
     <input type="text" name="name" value="{{document.name}}" placeholder="Unit name" {{#unless editable}}disabled{{/unless}}>
   </header>
 
   {{#if document.isToken}}
-  <div class="axona-division-field">{{#if tokenDivisionImg}}<img class="axona-division-icon" src="{{tokenDivisionImg}}" alt="">{{/if}}<span>Division: {{tokenDivisionName}}</span><button type="button" class="axona-vital{{#if unit.vital}} active{{/if}}" data-action="toggleVital" aria-pressed="{{#if unit.vital}}true{{else}}false{{/if}}" aria-label="Vital" title="Vital" {{#unless editable}}disabled{{/unless}}><i class="{{#if unit.vital}}fa-solid{{else}}fa-regular{{/if}} fa-star"></i></button></div>
+  <div class="axona-division-field">
+    <button type="button" class="axona-vital{{#if unit.vital}} active{{/if}}" data-action="toggleVital" aria-pressed="{{#if unit.vital}}true{{else}}false{{/if}}" aria-label="Vital" title="Vital" {{#unless editable}}disabled{{/unless}}></button>
+    <div class="axona-unit-division-info">
+      <span title="{{tokenDivisionName}}">{{tokenDivisionName}}</span>
+      {{#if tokenDivisionCommander}}<span class="axona-unit-division-commander" title="{{tokenDivisionCommander}}">{{tokenDivisionCommander}}</span>{{/if}}
+    </div>
+    {{#if tokenDivisionImg}}<span class="axona-division-frame"><img class="axona-division-icon" src="{{tokenDivisionImg}}" alt=""></span>{{/if}}
+  </div>
   {{/if}}
 
   <section class="axona-block">
@@ -39,16 +55,31 @@
     </div>
     <section class="axona-battle-box">
       <h3>Battle Stats</h3>
-      <div class="axona-stats">
-        {{#each stats}}
-        <label class="axona-stat">
-          <span>{{#if sheetLabel}}{{sheetLabel}}{{else}}{{label}}{{/if}}</span>
-          <span class="axona-stat-field">
-            <input type="number" name="flags.axona.unit.battle.{{key}}" value="{{value}}" min="{{min}}" step="1" data-dtype="Number" {{#unless ../editable}}disabled{{/unless}}>
-            {{#if suffix}}<span class="axona-suffix">{{suffix}}</span>{{/if}}
-          </span>
-        </label>
-        {{/each}}
+      <div class="axona-battle-row">
+        <div class="axona-stats">
+          {{#each stats}}
+          <label class="axona-stat" title="{{label}}">
+            <span>{{#if sheetLabel}}{{sheetLabel}}{{else}}{{label}}{{/if}}</span>
+            <span class="axona-stat-field">
+              <input type="number" name="flags.axona.unit.battle.{{key}}" value="{{value}}" min="{{min}}" step="1" data-dtype="Number" aria-label="{{label}}" {{#unless ../editable}}disabled{{/unless}}>
+              {{#if suffix}}<span class="axona-suffix">{{suffix}}</span>{{/if}}
+            </span>
+          </label>
+          {{/each}}
+        </div>
+        <div class="axona-battle-hp">
+          <div class="axona-battle-hp-values">
+            <label for="axona-hp-{{document.id}}">HP</label>
+            <div class="axona-battle-hp-fields">
+              <span class="axona-stat axona-stat-field">
+                <input id="axona-hp-{{document.id}}" type="number" name="flags.axona.unit.hp.value" value="{{unit.hp.value}}" min="0" max="{{maxHp}}" step="1" data-dtype="Number" {{#unless editable}}disabled{{/unless}}>
+              </span>
+              <span class="axona-stat axona-stat-field" title="Maximum HP">
+                <output class="axona-max-hp" aria-label="Maximum HP">{{maxHp}}</output>
+              </span>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   </section>

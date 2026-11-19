@@ -194,10 +194,10 @@ export const SIZE_MODS = {
 };
 
 export const STATS = [
-  { key: "clash", label: "Clash", min: 0, initial: 0 },
-  { key: "sustained", label: "Sustained", min: 0, initial: 0 },
-  { key: "shortRange", label: "Short Range", sheetLabel: "SRange", min: 0, initial: 0, zeroLocked: true },
-  { key: "longRange", label: "Long Range", sheetLabel: "LRange", min: 0, initial: 0, zeroLocked: true },
-  { key: "morale", label: "Morale Save", sheetLabel: "Morale", min: 0, initial: 0, suffix: "+" },
-  { key: "stamina", label: "Stamina", min: 1, initial: 6 }
+  { key: "clash", label: "Clash", sheetLabel: "C", min: 0, initial: 0 },
+  { key: "sustained", label: "Sustained", sheetLabel: "Su", min: 0, initial: 0 },
+  { key: "shortRange", label: "Short Range", sheetLabel: "SR", min: 0, initial: 0, zeroLocked: true },
+  { key: "longRange", label: "Long Range", sheetLabel: "LR", min: 0, initial: 0, zeroLocked: true },
+  { key: "morale", label: "Morale Save", sheetLabel: "M", min: 0, initial: 0, suffix: "+" },
+  { key: "stamina", label: "Stamina", sheetLabel: "S", min: 1, initial: 6 }
 ];

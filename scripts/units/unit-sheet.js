@@ -10,12 +10,14 @@ import {
 } from "../constants.js";
 import { getUnit, getMaxHp, getHpColor, resourcePercent } from "./unit.js";
 import { getDivisions, getTokenDivisionId } from "../divisions/division.js";
+import { getCommander } from "../divisions/commander.js";
 
 export class ArmyUnitSheet extends foundry.applications.api.HandlebarsApplicationMixin(
   foundry.applications.sheets.ActorSheetV2
 ) {
   #listSearch = { talents: "", stances: "", weapons: "" };
   #contextMenuContainers = new WeakSet();
+  #divisionLabelObserver = null;
 
   static DEFAULT_OPTIONS = {
     classes: ["axona", "army-unit"],
@@ -61,6 +63,7 @@ export class ArmyUnitSheet extends foundry.applications.api.HandlebarsApplicatio
       context.tokenDivisionName = division?.name
         ?? (divisionId ? "Unavailable division" : "None");
       context.tokenDivisionImg = division?.img ?? null;
+      context.tokenDivisionCommander = division ? getCommander(game.actors.get(division.id))?.name : null;
     }
     context.maxHp = maxHp;
     context.hpPercent = resourcePercent(unit.hp.value, maxHp);
@@ -105,6 +108,26 @@ export class ArmyUnitSheet extends foundry.applications.api.HandlebarsApplicatio
 
   async _onRender(context, options) {
     await super._onRender(context, options);
+    this.#divisionLabelObserver?.disconnect();
+    this.#divisionLabelObserver = null;
+    const divisionInfo = this.element.querySelector(".axona-unit-division-info");
+    if (divisionInfo) {
+      const ownerWindow = divisionInfo.ownerDocument.defaultView;
+      const portrait = this.element.querySelector(".axona-unit-portrait");
+      const updateDivisionLabels = () => {
+        const width = portrait?.offsetWidth;
+        if (width) divisionInfo.parentElement.style.setProperty("--axona-unit-portrait-width", `${width}px`);
+        else divisionInfo.parentElement.style.removeProperty("--axona-unit-portrait-width");
+        this.#fitDivisionLabels(divisionInfo);
+      };
+      this.#divisionLabelObserver = new ownerWindow.ResizeObserver(updateDivisionLabels);
+      this.#divisionLabelObserver.observe(divisionInfo);
+      if (portrait) this.#divisionLabelObserver.observe(portrait);
+      updateDivisionLabels();
+      divisionInfo.ownerDocument.fonts.ready.then(() => {
+        if (divisionInfo.isConnected) updateDivisionLabels();
+      });
+    }
     for (const tab of this.element.querySelectorAll('section.tab[data-group="primary"][data-tab="unit"], section.tab[data-group="primary"][data-tab="talents"]')) {
       if (this.#contextMenuContainers.has(tab)) continue;
       this.#contextMenuContainers.add(tab);
@@ -158,6 +181,35 @@ export class ArmyUnitSheet extends foundry.applications.api.HandlebarsApplicatio
         if (event.key === "Enter") event.preventDefault();
       };
       filter();
+    }
+  }
+
+  _onClose(options) {
+    this.#divisionLabelObserver?.disconnect();
+    this.#divisionLabelObserver = null;
+    super._onClose(options);
+  }
+
+  #fitDivisionLabels(divisionInfo) {
+    const ownerWindow = divisionInfo.ownerDocument.defaultView;
+    for (const label of divisionInfo.children) {
+      label.style.removeProperty("font-size");
+      const style = ownerWindow.getComputedStyle(label);
+      const bounds = label.getBoundingClientRect();
+      const width = parseFloat(style.width);
+      if (!width || !bounds.width) continue;
+      const scale = bounds.width / width;
+      const available = bounds.width - (parseFloat(style.paddingLeft) + parseFloat(style.paddingRight)) * scale;
+      const range = label.ownerDocument.createRange();
+      range.selectNodeContents(label);
+      const textWidth = range.getBoundingClientRect().width;
+      if (available > 0 && textWidth > available) {
+        label.style.fontSize = `${parseFloat(style.fontSize) * available / textWidth * 0.995}px`;
+      }
+      if (label === divisionInfo.firstElementChild) {
+        const offset = (range.getBoundingClientRect().left - bounds.left) / scale;
+        divisionInfo.style.setProperty("--axona-commander-offset", `${Math.max(0, offset)}px`);
+      }
     }
   }
 

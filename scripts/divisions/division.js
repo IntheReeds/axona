@@ -98,16 +98,31 @@ export function registerDivisionHooks() {
       candidate.sheet.render();
     }
   }, 50);
-  Hooks.on("createActor", refresh);
+  const refreshTokenSheets = foundry.utils.debounce(() => {
+    for (const token of getPlacedUnits()) {
+      if (token.actor?.isToken && token.actor.sheet?.rendered) token.actor.sheet.render();
+    }
+  }, 50);
+  Hooks.on("createActor", () => {
+    refresh();
+    refreshTokenSheets();
+  });
   Hooks.on("updateActor", (actor, changes) => {
     const expanded = foundry.utils.expandObject(changes);
     if (["name", "img", "prototypeToken", `flags.${MODULE_ID}.army`, `flags.${MODULE_ID}.-=army`,
       `flags.${MODULE_ID}.division`, `flags.${MODULE_ID}.-=division`,
       `flags.${MODULE_ID}.unit.divisionId`, `flags.${MODULE_ID}.unit`, `flags.${MODULE_ID}.-=unit`]
       .some(path => foundry.utils.hasProperty(expanded, path)) ||
-      foundry.utils.hasProperty(expanded, `flags.${MODULE_ID}.unit.battle`)) refresh(actor);
+      foundry.utils.hasProperty(expanded, `flags.${MODULE_ID}.unit.battle`)) {
+      refresh();
+      if (!getUnit(actor) || getDivision(actor) ||
+          foundry.utils.hasProperty(expanded, `flags.${MODULE_ID}.-=division`)) refreshTokenSheets();
+    }
   });
-  Hooks.on("deleteActor", refresh);
+  Hooks.on("deleteActor", () => {
+    refresh();
+    refreshTokenSheets();
+  });
   Hooks.on("createToken", refresh);
   Hooks.on("updateToken", (token, changes) => {
     const expanded = foundry.utils.expandObject(changes);

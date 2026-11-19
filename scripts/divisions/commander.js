@@ -1,4 +1,4 @@
-import { MODULE_ID } from "../constants.js";
+ import { MODULE_ID } from "../constants.js";
 import { getDivision } from "./division.js";
 import { getUnit } from "../units/unit.js";
 import { getArmy } from "../armies/army.js";
