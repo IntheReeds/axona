@@ -1,0 +1,270 @@
+@font-face {
+  font-family: "Axona";
+  src: url("../fonts/axona.otf") format("opentype");
+}
+
+.axona .window-content, .axona .window-title {
+  font-family: "Axona", sans-serif;
+}
+
+.axona .window-content :is(input, select, button, textarea) {
+  font-family: inherit;
+}
+
+.axona .window-content :is(h1, h2, h3, h4, h5, h6) {
+  font-family: "Axona", sans-serif;
+}
+
+
+
+/* ---------- 1. Shared blocks, rows and bars ---------- */
+.axona-block h3 { margin: 0 0 0.25rem; border-bottom: 1px solid var(--color-border-light-tertiary, #999); }
+.axona-row { display: flex; align-items: center; gap: 0.4rem; margin-top: 0.3rem; }
+.axona-row input[type="number"] { width: 4rem; }
+.axona-note { margin: 0.3rem 0 0; font-size: 0.75rem; opacity: 0.7; }
+.axona-search-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem; border-bottom: 1px solid var(--color-border-light-tertiary, #999); }
+.axona-search-header h3 { flex: 1; margin: 0; border: 0; }
+.axona-search-header input[type="search"] { flex: 0 1 12rem; min-width: 0; }
+
+.axona-resource-bar { flex: 1 1 2rem; min-width: 2rem; height: 14px; border: 1px solid var(--color-border-light-tertiary, #999); background: #0004; overflow: hidden; }
+.axona-resource-bar span { display: block; height: 100%; }
+.axona-hp-bar { background: #0008; }
+.axona-hp-bar span { background: #3a9b4a; }
+.axona-mp-bar span { background: #3478c0; }
+
+/* ---------- 2. Sheet headers ---------- */
+.axona-header { display: flex; align-items: center; gap: 0.5rem; }
+.axona-header img { width: 64px; height: 64px; object-fit: cover; cursor: pointer; }
+.axona-header input { font-size: 1.4rem; flex: 1; min-width: 0; }
+.axona-division-sheet .axona-header img, .axona-army-sheet .axona-header img { object-fit: contain; }
+.axona.army-unit .axona-header img { width: auto; height: 64px; max-width: 45%; flex: 0 0 auto; object-fit: contain; }
+.axona.army-unit .axona-header { position: relative; align-items: flex-start; padding-top: 0; margin-top: -24px; height: 3rem; }
+.axona.army-unit .axona-frame.axona-unit-summary { padding-top: 0; }
+.axona.army-unit .axona-header::before {
+  content: ""; position: absolute; top: 0; left: 0; right: 0; aspect-ratio: 434 / 68;
+  background: url("../assets/ui/banner_1.png") center / 100% 100% no-repeat; pointer-events: none;
+}
+.axona.army-unit .axona-header > * { position: relative; z-index: 1; }
+.axona.army-unit .axona-header img { margin-top: 2.25rem; }
+.axona.army-unit .axona-division-field { margin-left: 5rem; min-height: 4.5rem; align-items: flex-start; }
+.axona.army-unit .axona-header input { background: transparent; margin-top: 0.5rem; font-size: 1.2rem; }
+
+/* ---------- 3. Tabs ---------- */
+.axona .sheet-tabs { display: flex; gap: 1rem; border-bottom: 1px solid var(--color-border-light-tertiary, #999); margin: 0 0.75rem 0.5rem; }
+.axona .sheet-tabs a { padding: 0.2rem 0.4rem; cursor: pointer; }
+.axona .sheet-tabs a.active { font-weight: bold; border-bottom: 2px solid currentColor; }
+/* charview_tab sprite: left half = selected, right half = unselected */
+.axona.army-unit .sheet-tabs { gap: 0; border-bottom: 0; }
+.axona.army-unit .sheet-tabs a {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 110px; height: 40px; padding: 0; box-sizing: border-box;
+  background: url("../assets/ui/charview_tab.png") 0 0 / 200% auto no-repeat;
+  color: #f0e6d2; text-shadow: 0 1px 2px #000;
+}
+.axona.army-unit .sheet-tabs a:not(.active) { background-position: 100% 0; }
+.axona.army-unit .sheet-tabs a.active { border-bottom: 0; }
+.axona.army-unit .window-content {
+  display: flex; flex-direction: column;
+}
+.axona.army-unit .sheet-tabs { margin: 0 0.25rem; }
+/* Floral frame around the fixed summary and around whichever tab's box is active */
+.axona.army-unit .axona-frame,
+.axona.army-unit section.tab {
+  margin: 0 0.25rem; padding: 0.75rem;
+  border: 12px solid transparent;
+  border-image: url("../assets/ui/charview_frame.png") 12 stretch;
+}
+.axona.army-unit section.tab { border-image-source: url("../assets/ui/bottom_border.png"); }
+.axona section.tab { padding: 0 0.75rem 0.75rem; }
+.axona.army-unit section.tab { padding: 0.75rem; }
+.axona.army-unit section.tab[data-tab="unit"] { padding: 0; }
+.axona.army-unit .axona-parchment {
+  padding: 0.25rem;
+  background: url("../assets/ui/parchment_2.png") center / cover;
+}
+.axona.army-unit .axona-parchment > .axona-frame { margin: 0; }
+.axona section.tab > .axona-block + .axona-block { margin-top: 0.75rem; }
+
+/* ---------- 4. Unit sheet ---------- */
+.axona.army-unit .window-content { padding: 0 0.25rem; gap: 0; }
+.axona.army-unit .axona-parchment { margin-bottom: 0.5rem; }
+.axona.army-unit .axona-parchment,
+.axona.army-unit .axona-parchment :is(input, label, span, h3, p),
+.axona.army-unit .axona-header input { color: #18161B; }
+
+/* Types */
+.axona-types { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; }
+.axona.army-unit .axona-types { background: url("../assets/ui/nameplate_box_1.png") center / 100% 100% no-repeat; padding: 0.3rem 0.5rem; box-shadow: 0 3px 6px rgba(0, 0, 0, 0.6); }
+.axona.army-unit .axona-types select { background: transparent; border: 0; border-radius: 0; color: #fff; font-weight: bold; text-shadow: 0 1px 2px #000; }
+.axona.army-unit .axona-types select[name="flags.axona.unit.attackType"] { background: url("../assets/ui/bar_red_1.png") center / 100% 100% no-repeat; }
+
+/* Boxes */
+.axona-condition-box, .axona-stances, .axona-battle-box, .axona-talent-box, .axona-weapon-box { margin-top: 0.75rem; padding: 0.4rem; border: 1px solid var(--color-border-light-tertiary, #999); border-radius: 4px; }
+.axona.army-unit .axona-battle-box > h3, .axona.army-unit .axona-condition-box > h3, .axona.army-unit .axona-talent-box > h3, .axona.army-unit .axona-weapon-box > h3 { font-size: 1rem; }
+.axona.army-unit .axona-battle-box {
+  border: 8px solid transparent; border-radius: 0;
+  border-image: url("../assets/ui/box_shield_2.png") 8 fill stretch;
+}
+.axona-condition-box, .axona-talent-box, .axona-weapon-box { container-type: inline-size; }
+.axona.army-unit .axona-talent-box > h3, .axona.army-unit .axona-weapon-box > h3, .axona.army-unit .axona-condition-box > h3, .axona.army-unit .axona-stances > .axona-stances-title { position: absolute; top: 0; left: 0; right: 0; height: 20px; margin: 0; line-height: 20px; text-align: center; font-size: 1rem; }
+.axona.army-unit .axona-stances { margin-top: 0; }
+.axona.army-unit .axona-stances > h3:not(.axona-stances-title) { margin: 0; }
+.axona.army-unit .axona-talent-box, .axona.army-unit .axona-weapon-box, .axona.army-unit .axona-condition-box, .axona.army-unit .axona-stances { position: relative; }
+
+/* Resources (HP / MP) */
+.axona-resources { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.5rem; }
+.axona-resource { display: flex; flex-wrap: wrap; align-items: center; gap: 0.25rem; min-width: 0; }
+.axona-resource input[type="number"] { flex: 0 0 2.25rem; width: 2.25rem; min-width: 0; padding: 0 0.2rem; text-align: center; }
+
+/* Battle stats */
+.axona-stats { display: flex; flex-wrap: wrap; gap: 0.25rem; }
+.axona-stat { display: flex; flex: 0 0 3.75rem; flex-direction: column; align-items: center; justify-content: flex-end; gap: 0.1rem; min-width: 0; font-size: 0.8rem; text-align: center; }
+.axona.army-unit .axona-stat input { width: 2.5rem; min-width: 0; height: 2rem; padding: 0 0.2rem; text-align: center; border: 6px solid transparent; border-radius: 0; border-image: url("../assets/ui/box_shield_2.png") 8 fill stretch; background: transparent; }
+.axona-stat-field { display: flex; align-items: center; justify-content: center; gap: 0.1rem; }
+.axona-suffix { font-weight: bold; }
+
+/* Conditions and stances */
+.axona-health-stances { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 0; margin-top: 0; }
+.axona-health-stances > section { margin-top: 0; }
+.axona.army-unit .axona-health-stances > section {
+  position: relative; border: 0; border-radius: 0; padding: 1.4rem 0.75rem 0.8rem;
+  background: url("../assets/ui/bottom_box_bg.png") center / 100% 100% no-repeat;
+}
+.axona.army-unit .axona-health-stances > section:nth-child(odd) {
+  background:
+    url("../assets/ui/bottom_box_column.png") right center repeat-y,
+    url("../assets/ui/bottom_box_bg.png") center / 100% 100% no-repeat;
+}
+/* Ends keep their natural size; only the middle of each strip stretches */
+.axona.army-unit .axona-health-stances > section::before,
+.axona.army-unit .axona-health-stances > section::after {
+  content: ""; position: absolute; left: 0; right: 0; pointer-events: none;
+  border-style: solid; border-image-repeat: stretch;
+}
+.axona.army-unit .axona-health-stances > section::before {
+  top: 0; border-width: 20px 16px 0; border-image-source: url("../assets/ui/bottom_box_top.png"); border-image-slice: 20 16 0 16;
+}
+.axona.army-unit .axona-health-stances > section::after {
+  bottom: 0; border-width: 0 16px 9px; border-image-source: url("../assets/ui/bottom_box_bottom.png"); border-image-slice: 0 16 9 16;
+}
+.axona-conditions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: min-content; gap: 0.3rem; margin-top: 0.3rem; }
+.axona-condition { display: flex; align-items: center; gap: 0.2rem; min-width: 0; font-size: 0.8rem; }
+.axona-condition img { width: 20px; height: 20px; flex: 0 0 20px; object-fit: cover; border-radius: 4px; }
+.axona-condition span { min-width: 0; overflow-wrap: anywhere; color: #e7d1b1; }
+.axona-stances { align-self: start; }
+.axona-stance-list { display: flex; flex-direction: column; gap: 0.3rem; max-height: 7rem; overflow-y: auto; }
+.axona.army-unit button.axona-stance { display: grid; grid-template-columns: 24px minmax(0, 1fr); align-items: center; gap: 0.3rem; height: auto; min-height: 32px; padding: 0.15rem 0.3rem; text-align: left; }
+.axona.army-unit .axona-stances h3 button.axona-stance { width: 100%; }
+.axona.army-unit .axona-stance-list button.axona-stance { flex: 0 0 auto; align-self: flex-start; width: fit-content; max-width: 100%; }
+.axona-stance .axona-talent-image { width: 24px; height: 24px; flex-basis: 24px; }
+.axona-stance.active { border-color: var(--color-border-highlight, #f0c674); font-weight: bold; }
+
+/* Talents */
+.axona-talents { display: grid; grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr)); gap: 0.4rem 0.75rem; max-height: 16rem; overflow-y: auto; padding-right: 0.25rem; }
+.axona-talent { display: flex; align-items: flex-start; gap: 0.4rem; min-width: 0; }
+.axona-talent[hidden], .axona-search-empty[hidden] { display: none; }
+.axona-talent span { display: flex; flex-direction: column; gap: 0.1rem; }
+.axona-talent small { opacity: 0.75; }
+[data-search-group="talents"] .axona-talent { color: #e7d1b1; }
+.axona section[data-tab="unit"] h3, .axona section[data-tab="talents"] h3 { color: #f0e6d2; }
+.axona-selected-talents { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.3rem; }
+.axona.army-unit button.axona-selected-talent { display: flex; align-items: center; justify-content: flex-start; gap: 0.2rem; width: 100%; min-width: 0; height: auto; min-height: 20px; padding: 0; border: 0; background: transparent; font-size: 0.8rem; text-align: left; }
+.axona-selected-talent span { min-width: 0; overflow-wrap: anywhere; }
+.axona-talent-image { width: 40px; height: 40px; flex: 0 0 40px; object-fit: cover; border-radius: 4px; }
+.axona-selected-talent .axona-talent-image { width: 20px; height: 20px; flex-basis: 20px; }
+
+/* ---------- 5. Division sheet ---------- */
+.axona-division-sheet .window-content { padding: 0.5rem; gap: 0.5rem; }
+.axona-division-field { display: flex; align-items: center; gap: 0.5rem; }
+.axona-division-field select { flex: 1; min-width: 0; }
+.axona-division-icon { flex: 0 0 auto; width: 24px; height: 24px; object-fit: contain; }
+.axona-vital { flex: 0 0 auto; padding: 0 0.25rem; line-height: 1; }
+.axona-vital.active { color: #f5c400; }
+
+/* Commander */
+.axona-division-sheet .axona-header img.axona-commander-img { cursor: pointer; }
+.axona-units-heading { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem; border-bottom: 1px solid var(--color-border-light-tertiary, #999); }
+.axona-block .axona-units-heading h3 { flex: 1; margin: 0; border: 0; }
+.axona-commander-name { min-width: 0; padding: 0.1rem 0.5rem; overflow-wrap: anywhere; text-align: right; background: #0002; border: 1px solid var(--color-border-light-tertiary, #999); border-radius: 4px; }
+
+/* Members */
+.axona-division-members { display: flex; flex-direction: column; gap: 0.25rem; max-height: 20rem; overflow-y: auto; }
+.axona-division-member { display: flex; align-items: center; gap: 0.5rem; }
+.axona-division-member[draggable="true"] { cursor: grab; }
+.axona-division-member.axona-dragging { opacity: 0.5; cursor: grabbing; }
+.axona-division-member.axona-drop-before { box-shadow: inset 0 2px currentColor; }
+.axona-division-member.axona-drop-after { box-shadow: inset 0 -2px currentColor; }
+.axona-division-member img { flex: 0 0 64px; width: 64px; height: 40px; object-fit: contain; }
+.axona-division-member-name { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.axona-division-member-name small { display: block; opacity: 0.7; }
+.axona-division-vbars { flex: 0 0 auto; display: flex; gap: 3px; height: 40px; }
+.axona-vbar { position: relative; width: 6px; height: 100%; border: 1px solid var(--color-border-light-tertiary, #999); background: #0004; overflow: hidden; }
+.axona-vbar span { position: absolute; left: 0; right: 0; bottom: 0; }
+.axona-mp-vbar span { background: #3478c0; }
+
+/* ---------- 6. Army sheet ---------- */
+.axona-army-sheet { min-width: 28rem; max-width: 95vw; max-height: 95vh; }
+.axona-army-sheet .window-content { padding: 0.5rem; }
+.axona-army-content { display: flex; flex-direction: column; min-height: 0; gap: 0.5rem; }
+.axona-army-has-divisions { --axona-army-center: max(10rem, calc(0.75rem + 18px + (var(--axona-division-count) - 1) * 8rem)); }
+
+/* Header and assign bar */
+.axona-army-header { justify-content: center; }
+.axona-army-header div { display: flex; flex-direction: column; align-items: flex-start; }
+.axona-army-has-divisions .axona-army-header { position: relative; align-self: flex-start; width: 20rem; max-width: 100%; left: min(var(--axona-army-center), calc(100% - 10rem)); transform: translateX(-50%); }
+.axona-army-assign { display: flex; align-items: center; gap: 0.5rem; }
+.axona-army-assign select { flex: 1; min-width: 0; }
+.axona-army-assign button { width: auto; }
+
+/* Chart and connectors */
+.axona-army-chart-scroll { flex: 0 1 auto; min-height: 0; max-height: calc(95vh - 9rem); overflow: auto; }
+.axona-army-chart { position: relative; display: flex; box-sizing: border-box; width: max-content; min-width: 100%; align-items: flex-start; padding: 1rem 0 0 calc(var(--axona-army-center) - (0.75rem + 18px + (var(--axona-division-count) - 1) * 8rem)); }
+.axona-army-chart::before { content: ""; position: absolute; top: 0; left: var(--axona-army-center); height: 1rem; border-left: 1px solid currentColor; }
+.axona-army-division { position: relative; box-sizing: border-box; flex: 0 0 16rem; padding: 1px 0.75rem 0; }
+.axona-army-division::before { content: ""; position: absolute; top: 0; left: calc(0.75rem + 18px); height: 1rem; border-left: 1px solid currentColor; }
+.axona-army-division::after { content: ""; position: absolute; top: 0; left: 0; right: 0; border-top: 1px solid currentColor; pointer-events: none; }
+.axona-army-division:first-child::after { left: calc(0.75rem + 18px); }
+.axona-army-division:last-child::after { right: calc(15.25rem - 18px); }
+.axona-army-division:only-child::after { display: none; }
+.axona-army-division.axona-drop-target { outline: 1px dashed currentColor; outline-offset: -2px; }
+.axona-army-division-heading { position: relative; padding-top: 1rem; }
+.axona-army-division-heading::after { content: ""; position: absolute; top: calc(1rem + 36px); bottom: 0; left: 18px; border-left: 1px solid currentColor; pointer-events: none; }
+.axona-army-division-heading .axona-army-entry { justify-content: flex-start; align-items: flex-start; height: auto; min-height: 36px; padding: 0; }
+
+/* Entries (division and unit buttons) */
+.axona-army-entry { display: flex; align-items: center; gap: 0.4rem; width: 100%; min-width: 0; border: 0; background: transparent; box-shadow: none; text-align: left; }
+.axona-army-entry img { flex: 0 0 36px; width: 36px; height: 36px; object-fit: contain; }
+.axona-army-entry span { min-width: 0; overflow-wrap: anywhere; }
+.axona-army-entry small { display: block; opacity: 0.7; }
+
+/* Units */
+.axona-army-units { margin-left: 18px; padding: 0.5rem 0 0 1rem; border-left: 1px solid currentColor; }
+.axona-army-unit { position: relative; margin-bottom: 0.5rem; }
+.axona-army-unit > strong { display: block; margin-left: 0.5rem; }
+.axona-army-unit[draggable="true"] { cursor: grab; }
+.axona-army-unit.axona-dragging { opacity: 0.5; cursor: grabbing; }
+.axona-army-unit.axona-drop-before { box-shadow: inset 0 2px currentColor; }
+.axona-army-unit.axona-drop-after { box-shadow: inset 0 -2px currentColor; }
+.axona-army-unit .axona-army-entry { position: relative; justify-content: flex-start; height: auto; min-height: 40px; padding: 0; }
+.axona-army-unit .axona-army-entry::before { content: ""; position: absolute; top: 50%; left: calc(-1rem - 1px); width: calc(1rem + 1px); border-top: 1px solid currentColor; pointer-events: none; }
+.axona-army-unit .axona-army-entry img { flex-basis: 64px; width: 64px; height: 40px; object-position: left center; }
+.axona-army-unit.axona-size-small .axona-army-entry img { flex-basis: 52px; width: 52px; height: 32px; }
+.axona-army-unit.axona-size-large .axona-army-entry img { flex-basis: 76px; width: 76px; height: 48px; }
+.axona-army-hp { display: flex; gap: 0.5rem; align-items: flex-start; width: max-content; max-width: 100%; margin-left: 0.25rem; font-size: 0.8rem; white-space: nowrap; }
+.axona-army-hp > div { min-width: 4rem; }
+.axona-army-hp .axona-resource-bar { flex: none; min-width: 0; height: 8px; }
+
+/* ---------- 7. Misc ---------- */
+.axona-break-test { display: flex; gap: 0.4rem; }
+.axona-flags { margin: 0; padding: 0.5rem; overflow: auto; max-height: 24rem; user-select: text; font-size: 0.8rem; background: #0002; border-radius: 4px; }
+
+/* ---------- 8. Responsive ---------- */
+@container (max-width: 210px) {
+  .axona-conditions { grid-template-columns: 1fr; }
+}
+@container (max-width: 130px) {
+  .axona-selected-talents { grid-template-columns: 1fr; }
+}
+@media (max-width: 420px) {
+  .axona-health-stances { grid-template-columns: 1fr; }
+}

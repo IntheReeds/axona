@@ -1,0 +1,75 @@
+<div class="axona-army-content{{#if divisions}} axona-army-has-divisions{{/if}}"{{#if divisions}} style="--axona-division-count: {{divisions.length}}"{{/if}}>
+  <header class="axona-header axona-army-header">
+    <img src="{{document.img}}" alt="" data-edit="img" data-action="editImage">
+    <div>
+      <strong>XXXX</strong>
+      <input type="text" name="name" value="{{document.name}}" placeholder="Army name" {{#unless editable}}disabled{{/unless}}>
+    </div>
+  </header>
+
+  {{#if editable}}
+  <div class="axona-army-assign">
+    <label for="axona-army-division-{{document.id}}">Add division</label>
+    <select id="axona-army-division-{{document.id}}" data-army-division>
+      <option value="">Select a division to add</option>
+      {{#each availableDivisions}}
+      <option value="{{id}}" {{#unless canEdit}}disabled{{/unless}}>{{name}}{{#unless canEdit}} (no permission){{/unless}}</option>
+      {{/each}}
+    </select>
+  </div>
+  {{/if}}
+
+  {{#if divisions}}
+  <div class="axona-army-chart-scroll">
+    <div class="axona-army-chart">
+      {{#each divisions}}
+      <section class="axona-army-division" data-division-id="{{id}}">
+        <div class="axona-army-division-heading">
+          <button type="button" class="axona-army-entry" data-action="openDivision" data-division-id="{{id}}">
+            <img src="{{img}}" alt="">
+            <span>{{name}}{{#if commanderName}}<small>{{commanderName}}</small>{{/if}}</span>
+          </button>
+        </div>
+        <div class="axona-army-units">
+          {{#each units}}
+          <div class="axona-army-unit axona-size-{{sizeClass}}" data-unit-id="{{id}}" draggable="{{#if ../../editable}}{{#if ../canEdit}}true{{else}}false{{/if}}{{else}}false{{/if}}">
+            <strong>{{sizeMarker}}</strong>
+            
+            
+            <button type="button" class="axona-army-entry" data-action="openUnit" data-unit-id="{{id}}">
+              <img src="{{img}}" alt="" draggable="false">
+              <span>{{name}}<small>{{scene}}</small></span>
+            </button>
+            <div class="axona-army-hp">
+              <div>
+                <span>HP {{hp}} / {{maxHp}}</span>
+                <div class="axona-resource-bar axona-hp-bar" role="progressbar"
+                  aria-label="{{name}} HP" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{hpPercent}}"
+                  style="width: {{barLength}}px">
+                  <span style="width: {{hpPercent}}%; background: {{hpColor}}"></span>
+                </div>
+              </div>
+              {{#if usesMagic}}
+              <div>
+                <span>MP {{mp}} / {{maxMp}}</span>
+                <div class="axona-resource-bar axona-mp-bar" role="progressbar"
+                  aria-label="{{name}} MP" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{mpPercent}}"
+                  style="width: 96px">
+                  <span style="width: {{mpPercent}}%"></span>
+                </div>
+              </div>
+              {{/if}}
+            </div>
+          </div>
+          {{else}}
+          <p>No units assigned.</p>
+          {{/each}}
+        </div>
+      </section>
+      {{/each}}
+    </div>
+  </div>
+  {{else}}
+  <p>No divisions assigned.</p>
+  {{/if}}
+</div>

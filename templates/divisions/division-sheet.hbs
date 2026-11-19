@@ -1,0 +1,54 @@
+<div>
+<header class="axona-header">
+  <img src="{{document.img}}" alt="" data-edit="img" data-action="editImage">
+  <input type="text" name="name" value="{{document.name}}" placeholder="Division name" {{#unless editable}}disabled{{/unless}}>
+  {{#if commander}}
+  <img class="axona-commander-img" src="{{commander.img}}" alt="{{commander.name}}" draggable="false">
+  {{/if}}
+</header>
+
+<section class="axona-block">
+  <div class="axona-units-heading">
+    <h3>Units</h3>
+    {{#if commander}}
+    <span class="axona-commander-name">{{commander.name}}</span>
+    {{/if}}
+  </div>
+  <div class="axona-division-members">
+    {{#each members}}
+    <div class="axona-division-member" data-unit-id="{{id}}" role="button" tabindex="0"
+      draggable="{{#if ../editable}}true{{else}}false{{/if}}" aria-label="Open {{name}}">
+      <div class="axona-division-vbars">
+        <div class="axona-vbar axona-hp-vbar" role="progressbar" title="HP {{hp}} / {{maxHp}}"
+          aria-label="{{name}} HP" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{hpPercent}}">
+          <span style="height: {{hpPercent}}%; background: {{hpColor}}"></span>
+        </div>
+        {{#if usesMagic}}
+        <div class="axona-vbar axona-mp-vbar" role="progressbar" title="MP {{mp}} / {{maxMp}}"
+          aria-label="{{name}} MP" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{mpPercent}}">
+          <span style="height: {{mpPercent}}%"></span>
+        </div>
+        {{/if}}
+      </div>
+      <img src="{{img}}" alt="" draggable="false">
+      <span class="axona-division-member-name">{{name}} <strong class="axona-size-marker">{{sizeMarker}}</strong><small>{{scene}}</small></span>
+      <button type="button" class="axona-vital{{#if vital}} active{{/if}}" data-action="toggleVital" data-unit-id="{{id}}"
+        aria-pressed="{{#if vital}}true{{else}}false{{/if}}" aria-label="Vital: {{name}}" title="Vital"
+        {{#unless ../editable}}disabled{{/unless}} {{#unless canEdit}}disabled{{/unless}}><i class="{{#if vital}}fa-solid{{else}}fa-regular{{/if}} fa-star"></i></button>
+    </div>
+    {{else}}
+    <p>No units assigned.</p>
+    {{/each}}
+  </div>
+  {{#if editable}}
+  <div class="axona-division-field">
+    <select data-division-unit aria-label="Unit to assign">
+      <option value="">Select a unit to add</option>
+      {{#each availableUnits}}
+      <option value="{{id}}" {{#unless canEdit}}disabled{{/unless}}>{{name}}{{#unless canEdit}} (no permission){{/unless}}</option>
+      {{/each}}
+    </select>
+  </div>
+  {{/if}}
+</section>
+</div>

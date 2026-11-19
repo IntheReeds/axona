@@ -1,0 +1,79 @@
+<section class="tab {{tab.cssClass}}" data-group="primary" data-tab="talents">
+  <section class="axona-block" data-search-group="talents">
+    <div class="axona-search-header">
+      <h3>Talents</h3>
+      <input type="search" data-list-search="talents" placeholder="Search talents" aria-label="Search talents" autocomplete="off">
+    </div>
+    <input type="hidden" name="flags.axona.unit.talents" value="">
+    <div class="axona-talents">
+      {{#each talents}}
+      <label class="axona-talent" data-search-label="{{label}}" data-talent-key="{{key}}" title="Right-click for options" {{#unless ../editable}}tabindex="0"{{/unless}}>
+        <input type="checkbox"
+          name="flags.axona.unit.talents"
+          value="{{key}}"
+          {{checked selected}}
+          {{#unless ../editable}}disabled{{/unless}}>
+        <img class="axona-talent-image" src="{{image}}" alt="{{label}}"
+          onerror="this.onerror=null;this.src='{{../talentFallbackImage}}';">
+        <span>
+          <strong>{{label}}</strong>
+        </span>
+      </label>
+      {{else}}
+      <p>No talents are currently defined.</p>
+      {{/each}}
+    </div>
+    <p class="axona-note axona-search-empty" hidden>No matching talents.</p>
+  </section>
+  <section class="axona-block" data-search-group="weapons">
+    <div class="axona-search-header">
+      <h3>Weapons</h3>
+      <input type="search" data-list-search="weapons" placeholder="Search weapons" aria-label="Search weapons" autocomplete="off">
+    </div>
+    <div class="axona-talents">
+      {{#each weapons}}
+      <label class="axona-talent" data-search-label="{{label}}" data-talent-key="{{key}}" title="Right-click for options" {{#unless ../editable}}tabindex="0"{{/unless}}>
+        <input type="checkbox"
+          name="flags.axona.unit.talents"
+          value="{{key}}"
+          {{checked selected}}
+          {{#unless ../editable}}disabled{{/unless}}>
+        <img class="axona-talent-image" src="{{image}}" alt="{{label}}"
+          onerror="this.onerror=null;this.src='{{../talentFallbackImage}}';">
+        <span>
+          <strong>{{label}}</strong>
+        </span>
+      </label>
+      {{else}}
+      <p>No weapons are currently defined.</p>
+      {{/each}}
+    </div>
+    <p class="axona-note axona-search-empty" hidden>No matching weapons.</p>
+  </section>
+  <section class="axona-block" data-search-group="stances">
+    <div class="axona-search-header">
+      <h3>Stances</h3>
+      <input type="search" data-list-search="stances" placeholder="Search stances" aria-label="Search stances" autocomplete="off">
+    </div>
+    <div class="axona-talents">
+      {{#each stances}}
+      <label class="axona-talent" data-search-label="{{label}}" data-talent-key="{{key}}" title="Right-click for options" {{#unless ../editable}}tabindex="0"{{/unless}}>
+        <input type="checkbox"
+          name="flags.axona.unit.talents"
+          value="{{key}}"
+          {{checked selected}}
+          {{#unless ../editable}}disabled{{/unless}}>
+        <img class="axona-talent-image" src="{{image}}" alt="{{label}}"
+          onerror="this.onerror=null;this.src='{{../talentFallbackImage}}';">
+        <span>
+          <strong>{{label}}</strong>
+        </span>
+      </label>
+      {{else}}
+      <p>No stances are currently defined.</p>
+      {{/each}}
+    </div>
+    <p class="axona-note axona-search-empty" hidden>No matching stances.</p>
+    
+  </section>
+</section>

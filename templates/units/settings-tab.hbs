@@ -1,0 +1,13 @@
+<section class="tab {{tab.cssClass}}" data-group="primary" data-tab="settings">
+  <section class="axona-block">
+    <h3>Settings</h3>
+    <div class="axona-row">
+      <label><input type="checkbox" name="flags.axona.unit.usesMagic" {{checked unit.usesMagic}} {{#unless editable}}disabled{{/unless}}> Uses Magic</label>
+    </div>
+    <p class="axona-note">Shows MP on the Unit tab.</p>
+    <div class="axona-row">
+      <label><input type="checkbox" name="flags.axona.unit.usesCloseRanks" {{checked unit.usesCloseRanks}} {{#unless editable}}disabled{{/unless}}> Uses Close Ranks</label>
+    </div>
+    <p class="axona-note">Shows Close Ranks on the Unit tab. Hiding it preserves its current state.</p>
+  </section>
+</section>

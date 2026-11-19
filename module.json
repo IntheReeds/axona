@@ -1,0 +1,33 @@
+{
+  "id": "axona",
+  "title": "Axona",
+  "version": "0.1.0",
+  "compatibility": {
+    "minimum": "14",
+    "verified": "14"
+  },
+  "authors": [
+    {
+      "name": "Pres",
+      "flags": {}
+    }
+  ],
+  "flags": {
+    "canUpload": true
+  },
+  "description": "",
+  "esmodules": [
+    "module.js"
+  ],
+  "packs": [
+    {
+      "name": "break-tests",
+      "label": "Axona Break Tests",
+      "path": "packs/break-tests",
+      "type": "RollTable"
+    }
+  ],
+  "styles": [
+    "styles/axona.css"
+  ]
+}

@@ -1,0 +1,75 @@
+<section class="tab {{tab.cssClass}}" data-group="primary" data-tab="unit">
+  <div class="axona-health-stances">
+        <section class="axona-condition-box">
+          <h3>Conditions</h3>
+          <div class="axona-conditions">
+            {{#each conditions}}
+            <label class="axona-condition">
+              <input type="checkbox" name="flags.axona.unit.{{key}}" {{checked active}} {{#unless ../editable}}disabled{{/unless}}>
+              <img src="{{image}}" alt="" onerror="this.onerror=null;this.src='{{../talentFallbackImage}}';">
+              <span>{{label}}</span>
+            </label>
+            {{/each}}
+          </div>
+        </section>
+      <section class="axona-stances">
+        <h3 class="axona-stances-title">Stance</h3>
+        {{#if activeStance}}
+        <h3>
+          <button type="button" class="axona-stance active"
+            data-action="toggleStance" data-stance-key="{{activeStance.key}}" aria-pressed="true"
+            {{#unless editable}}disabled{{/unless}}>
+            <img class="axona-talent-image" src="{{activeStance.image}}" alt=""
+              onerror="this.onerror=null;this.src='{{talentFallbackImage}}';">
+            <span>{{activeStance.label}}</span>
+          </button>
+        </h3>
+        {{/if}}
+        <div class="axona-stance-list">
+          {{#each inactiveStances}}
+          <button type="button" class="axona-stance"
+            data-action="toggleStance" data-stance-key="{{key}}" aria-pressed="false"
+            {{#unless ../editable}}disabled{{/unless}}>
+            <img class="axona-talent-image" src="{{image}}" alt=""
+              onerror="this.onerror=null;this.src='{{../talentFallbackImage}}';">
+            <span>{{label}}</span>
+          </button>
+          {{/each}}
+          {{#unless selectedStances}}
+          <p class="axona-note">No stances selected. Assign stances in the Talents tab.</p>
+          {{/unless}}
+        </div>
+      </section>
+        <section class="axona-talent-box">
+          <h3>Talents</h3>
+          <div class="axona-selected-talents">
+            {{#each selectedTalents}}
+            <button type="button" class="axona-selected-talent" data-talent-key="{{key}}"
+              aria-label="{{label}}: open context menu" title="Right-click for options">
+              <img class="axona-talent-image" src="{{image}}" alt=""
+                onerror="this.onerror=null;this.src='{{../talentFallbackImage}}';">
+              <span>{{label}}</span>
+            </button>
+            {{else}}
+            <p class="axona-note">No talents selected.</p>
+            {{/each}}
+          </div>
+        </section>
+      <section class="axona-weapon-box">
+        <h3>Weapons</h3>
+        <div class="axona-selected-talents">
+          {{#each selectedWeapons}}
+          <button type="button" class="axona-selected-talent" data-talent-key="{{key}}"
+            aria-label="{{label}}: open context menu" title="Right-click for options">
+            <img class="axona-talent-image" src="{{image}}" alt=""
+              onerror="this.onerror=null;this.src='{{../talentFallbackImage}}';">
+            <span>{{label}}</span>
+          </button>
+          {{else}}
+          <p class="axona-note">No weapons selected.</p>
+          {{/each}}
+        </div>
+      </section>
+    </div>
+
+</section>

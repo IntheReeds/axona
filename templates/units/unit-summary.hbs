@@ -1,0 +1,56 @@
+<div class="axona-parchment">
+<div class="axona-frame axona-unit-summary">
+  <header class="axona-header">
+    <img src="{{document.img}}" alt="" data-edit="img" data-action="editImage">
+    <input type="text" name="name" value="{{document.name}}" placeholder="Unit name" {{#unless editable}}disabled{{/unless}}>
+  </header>
+
+  {{#if document.isToken}}
+  <div class="axona-division-field">{{#if tokenDivisionImg}}<img class="axona-division-icon" src="{{tokenDivisionImg}}" alt="">{{/if}}<span>Division: {{tokenDivisionName}}</span><button type="button" class="axona-vital{{#if unit.vital}} active{{/if}}" data-action="toggleVital" aria-pressed="{{#if unit.vital}}true{{else}}false{{/if}}" aria-label="Vital" title="Vital" {{#unless editable}}disabled{{/unless}}><i class="{{#if unit.vital}}fa-solid{{else}}fa-regular{{/if}} fa-star"></i></button></div>
+  {{/if}}
+
+  <section class="axona-block">
+    <div class="axona-types">
+      <select name="flags.axona.unit.attackType" {{#unless editable}}disabled{{/unless}}>
+        {{selectOptions attackTypes selected=unit.attackType}}
+      </select>
+      <select name="flags.axona.unit.unitClass" {{#unless editable}}disabled{{/unless}}>
+        {{selectOptions unitClasses selected=unit.unitClass}}
+      </select>
+      <select name="flags.axona.unit.unitSize" {{#unless editable}}disabled{{/unless}}>
+        {{selectOptions unitSizes selected=unit.unitSize}}
+      </select>
+    </div>
+  </section>
+
+  <section class="axona-block">
+    <div class="axona-resources">
+      {{#if unit.usesMagic}}
+      <div class="axona-resource">
+        <label for="axona-mp-{{document.id}}">MP</label>
+        <input id="axona-mp-{{document.id}}" type="number" name="flags.axona.unit.mp.value" value="{{unit.mp.value}}" min="0" step="1" data-dtype="Number" {{#unless editable}}disabled{{/unless}}>
+        <span>/</span>
+        <input type="number" name="flags.axona.unit.mp.max" value="{{unit.mp.max}}" min="0" step="1" data-dtype="Number" aria-label="Maximum MP" {{#unless editable}}disabled{{/unless}}>
+        <div class="axona-resource-bar axona-mp-bar" role="progressbar" aria-label="MP" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{mpPercent}}">
+          <span style="width: {{mpPercent}}%"></span>
+        </div>
+      </div>
+      {{/if}}
+    </div>
+    <section class="axona-battle-box">
+      <h3>Battle Stats</h3>
+      <div class="axona-stats">
+        {{#each stats}}
+        <label class="axona-stat">
+          <span>{{#if sheetLabel}}{{sheetLabel}}{{else}}{{label}}{{/if}}</span>
+          <span class="axona-stat-field">
+            <input type="number" name="flags.axona.unit.battle.{{key}}" value="{{value}}" min="{{min}}" step="1" data-dtype="Number" {{#unless ../editable}}disabled{{/unless}}>
+            {{#if suffix}}<span class="axona-suffix">{{suffix}}</span>{{/if}}
+          </span>
+        </label>
+        {{/each}}
+      </div>
+    </section>
+  </section>
+</div>
+</div>
