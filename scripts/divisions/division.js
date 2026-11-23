@@ -41,6 +41,54 @@ export function sortDivisionUnits(units, division) {
   });
 }
 
+export function getSubunitParentId(token) {
+  return token.getFlag(MODULE_ID, "subunitOf") ?? "";
+}
+
+export function isSubunitsCollapsed(token) {
+  return !!token.getFlag(MODULE_ID, "subunitsCollapsed");
+}
+
+export function hasSubunitLinks(tokenUuid) {
+  return getPlacedUnits({ visibleOnly: false }).some(token => getSubunitParentId(token) === tokenUuid);
+}
+
+// Places each subunit directly after its parent. A link is ignored when its parent is not in the division
+// or is itself a subunit, so that unit is listed as a normal unit.
+export function arrangeSubunits(entries) {
+  const byId = new Map(entries.map(entry => [entry.id, entry]));
+  const parentOf = new Map();
+  for (const entry of entries) {
+    const parentId = getSubunitParentId(entry.token);
+    if (byId.has(parentId) && parentId !== entry.id && !byId.has(getSubunitParentId(byId.get(parentId).token))) {
+      parentOf.set(entry.id, parentId);
+    }
+  }
+  const arranged = [];
+  for (const entry of entries) {
+    if (parentOf.has(entry.id)) continue;
+    arranged.push({ ...entry, parentId: "" });
+    for (const child of entries) {
+      if (parentOf.get(child.id) === entry.id) arranged.push({ ...child, parentId: entry.id });
+    }
+  }
+  return arranged;
+}
+
+export function getDivisionEntries(division) {
+  const entries = getPlacedUnits()
+    .filter(token => getTokenDivisionId(token) === division.id)
+    .map(token => ({ id: token.uuid, token, scene: token.parent.name, name: token.name }));
+  return arrangeSubunits(sortDivisionUnits(entries, division));
+}
+
+// Returns the parent a unit takes when placed at targetId (null for the end of a division).
+// A unit with subunits always stays top-level.
+export function getDropParentId(entries, targetId, hasSubunits) {
+  if (hasSubunits || targetId === null) return "";
+  return entries.find(entry => entry.id === targetId)?.parentId ?? "";
+}
+
 export function getDivisionUnitOrder(division, sourceId, targetId, after) {
   const saved = getDivision(division)?.unitOrder;
   const order = [...new Set(Array.isArray(saved) ? saved : [])];
@@ -91,17 +139,17 @@ export async function removeDivision(actor) {
 
 export function registerDivisionHooks() {
   // Several hooks fire for one change; coalescing them avoids overlapping renders leaving a sheet stale.
-  const refresh = foundry.utils.debounce(() => {
-    for (const candidate of game.actors.contents) {
-      if ((!getDivision(candidate) && !getUnit(candidate) && !candidate.getFlag(MODULE_ID, "army")) ||
-          !candidate.sheet?.rendered) continue;
-      candidate.sheet.render();
+  // Renders open windows directly, because actor.sheet can be a different instance from the window on screen.
+  const renderOpenSheets = predicate => {
+    for (const app of foundry.applications.instances.values()) {
+      if (app.rendered && app.document?.documentName === "Actor" && predicate(app.document)) app.render();
     }
+  };
+  const refresh = foundry.utils.debounce(() => {
+    renderOpenSheets(candidate => !!getDivision(candidate) || !!getUnit(candidate) || !!candidate.getFlag(MODULE_ID, "army"));
   }, 50);
   const refreshTokenSheets = foundry.utils.debounce(() => {
-    for (const token of getPlacedUnits()) {
-      if (token.actor?.isToken && token.actor.sheet?.rendered) token.actor.sheet.render();
-    }
+    renderOpenSheets(actor => actor.isToken);
   }, 50);
   Hooks.on("createActor", () => {
     refresh();
@@ -127,10 +175,10 @@ export function registerDivisionHooks() {
   Hooks.on("updateToken", (token, changes) => {
     const expanded = foundry.utils.expandObject(changes);
     if (["name", "hidden", "actorId", "actorLink", "texture.src", "delta",
-      `flags.${MODULE_ID}.divisionId`]
+      `flags.${MODULE_ID}.divisionId`, `flags.${MODULE_ID}.subunitOf`, `flags.${MODULE_ID}.subunitsCollapsed`]
       .some(path => foundry.utils.hasProperty(expanded, path))) {
       refresh();
-      if (token.actor?.isToken && token.actor.sheet?.rendered) token.actor.sheet.render();
+      renderOpenSheets(actor => actor.isToken && actor.token?.uuid === token.uuid);
     }
   });
   Hooks.on("deleteToken", refresh);

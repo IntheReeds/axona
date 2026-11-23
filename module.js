@@ -13,7 +13,10 @@ import { registerActorMenu } from "./scripts/menu.js";
 import { registerTokenHud } from "./scripts/token-hud.js";
 import { registerBreakTests, rollSelectedBreakTest } from "./scripts/break-tests.js";
 import { registerDivisionHooks, getDivision, makeDivision, removeDivision } from "./scripts/divisions/division.js";
+import { deployDivision, returnDivision } from "./scripts/divisions/deploy.js";
 import { assignCommander, registerCommanderMacro } from "./scripts/divisions/commander.js";
+import { rollAttack, registerAttackMacro } from "./scripts/attacks/attack.js";
+import { registerClashHooks } from "./scripts/attacks/clash.js";
 import { DivisionSheet } from "./scripts/divisions/division-sheet.js";
 import { getArmy, makeArmy, removeArmy } from "./scripts/armies/army.js";
 import { ArmySheet } from "./scripts/armies/army-sheet.js";
@@ -49,7 +52,10 @@ Hooks.once("init", () => {
     getDivision,
     makeDivision,
     removeDivision,
+    deployDivision,
+    returnDivision,
     assignCommander,
+    rollAttack,
     getArmy,
     makeArmy,
     removeArmy
@@ -62,3 +68,5 @@ registerTokenHud();
 registerBreakTests();
 registerDivisionHooks();
 registerCommanderMacro();
+registerAttackMacro();
+registerClashHooks();

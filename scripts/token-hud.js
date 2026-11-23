@@ -136,7 +136,9 @@ export function registerTokenHud() {
     if (stance) {
       drawBadge(`stance:${stance.key}`, stance.image, stanceX, top + margin + radius);
     }
-    const belowStance = activeConditions.filter(condition => condition.belowStance);
+    const belowStance = activeConditions
+      .filter(condition => condition.belowStance)
+      .sort((a, b) => (b.key === "engaged") - (a.key === "engaged"));
     belowStance.forEach(({ key, image }, index) => {
       drawBadge(`condition:${key}`, image, stanceX, top + margin + radius + (index + 1) * (radius * 2 + 3 * s));
     });

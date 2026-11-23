@@ -4,7 +4,12 @@ import {
   SHEET_ID,
   STATS,
   SIZE_MODS,
-  UNIT_TALENTS
+  MOVEMENT_BY_CLASS,
+  OPEN_ORDER_MOVEMENT,
+  UNIT_TALENTS,
+  ATTACK_TYPES,
+  UNIT_CLASSES,
+  UNIT_SIZES
 } from "../constants.js";
 
 function toStat(value, min) {
@@ -35,6 +40,8 @@ export function createUnitData(battle = {}) {
     usesMagic: false,
     vital: false,
     talents: [],
+    talentTiers: {},
+    talentActive: {},
     activeStance: null
   };
 }
@@ -45,6 +52,11 @@ export function getUnit(actor) {
 
 export function getMaxHp(unit) {
   return unit.battle.stamina * 2;
+}
+
+export function getMovementFor(unitClass, activeStance) {
+  if (activeStance === "openOrder" && OPEN_ORDER_MOVEMENT[unitClass]) return OPEN_ORDER_MOVEMENT[unitClass];
+  return MOVEMENT_BY_CLASS[unitClass] ?? 6;
 }
 
 export function resourcePercent(value, max) {
@@ -69,13 +81,32 @@ export function getHpColor(unit, maxHp) {
 }
 
 async function promptBattleStats(name) {
-  const fields = STATS.map(s => `
+  const options = (entries, selected) => Object.entries(entries).map(([value, label]) =>
+    `<option value="${value}"${String(value) === String(selected) ? " selected" : ""}>${label}</option>`).join("");
+  const defaults = createUnitData();
+
+  const statFields = STATS.filter(s => s.key !== "stamina").map(s => `
     <div class="form-group">
       <label>${s.label}</label>
       <div class="form-fields">
         <input type="number" name="${s.key}" value="${s.initial}" min="${s.min}" step="1">${s.suffix ?? ""}
       </div>
     </div>`).join("");
+
+  const fields = `
+    <div class="form-group">
+      <label>Attack Type</label>
+      <div class="form-fields"><select name="attackType">${options(ATTACK_TYPES, defaults.attackType)}</select></div>
+    </div>
+    <div class="form-group">
+      <label>Unit Class</label>
+      <div class="form-fields"><select name="unitClass">${options(UNIT_CLASSES, defaults.unitClass)}</select></div>
+    </div>
+    <div class="form-group">
+      <label>Unit Size</label>
+      <div class="form-fields"><select name="unitSize">${options(UNIT_SIZES, defaults.unitSize)}</select></div>
+    </div>
+    ${statFields}`;
 
   return foundry.applications.api.DialogV2.prompt({
     window: { title: `Make Army Unit: ${name}` },
@@ -98,7 +129,14 @@ export async function makeUnit(actor, battle) {
   battle ??= await promptBattleStats(actor.name);
   if (!battle) return null;
 
-  const unit = createUnitData(battle);
+  const { attackType, unitClass, unitSize, ...battleStats } = battle;
+  const staminaBase = STATS.find(s => s.key === "stamina").initial;
+  battleStats.stamina = staminaBase + (SIZE_MODS[unitSize]?.stamina ?? 0);
+  const unit = createUnitData(battleStats);
+  if (attackType) unit.attackType = attackType;
+  if (unitClass) unit.unitClass = unitClass;
+  if (unitSize) unit.unitSize = unitSize;
+  unit.movement = MOVEMENT_BY_CLASS[unit.unitClass] ?? 6;
   await actor.update({
     [`flags.${MODULE_ID}.${FLAG}`]: unit,
     "flags.core.sheetClass": SHEET_ID
@@ -155,6 +193,8 @@ export async function applyDamage(actor, amount) {
         <div class="axona-break-test">
           <button type="button" data-attack="ranged">Ranged</button>
           <button type="button" data-attack="melee">Melee</button>
+          ${unit.talents?.includes("valiant") && unit.talentActive?.valiant !== false
+            ? `<button type="button" data-valiant>Use Valiant Reroll</button>` : ""}
         </div>
       `
     });
@@ -224,6 +264,13 @@ export function registerUnitHooks() {
     if (incomingTalents !== undefined && activeStance === undefined &&
         unit.activeStance && !selectedTalents.includes(unit.activeStance)) {
       foundry.utils.setProperty(changes, `${path}.activeStance`, null);
+    }
+
+    // Movement follows the unit class, and Open Order raises light cavalry and horse archers. A class or stance change resets it.
+    const newClass = incoming("unitClass") ?? unit.unitClass;
+    const newStance = incoming("activeStance") !== undefined ? incoming("activeStance") : unit.activeStance;
+    if (newClass !== unit.unitClass || newStance !== unit.activeStance) {
+      foundry.utils.setProperty(changes, `${path}.movement`, getMovementFor(newClass, newStance));
     }
 
     // Changing Stamina moves current HP by the same amount as max HP.

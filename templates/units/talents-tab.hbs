@@ -18,6 +18,17 @@
         <span>
           <strong>{{label}}</strong>
         </span>
+        {{#if tiered}}
+        <input type="number"
+          class="axona-talent-tier"
+          name="flags.axona.unit.talentTiers.{{key}}"
+          value="{{tier}}"
+          min="1"
+          step="1"
+          title="{{label}} tier"
+          aria-label="{{label}} tier"
+          {{#unless ../editable}}disabled{{/unless}}>
+        {{/if}}
       </label>
       {{else}}
       <p>No talents are currently defined.</p>

@@ -14,6 +14,7 @@ const CLASS_CATEGORIES = {
   lightCavalry: "cavalry",
   mediumCavalry: "cavalry",
   heavyCavalry: "cavalry",
+  horseArcher: "cavalry",
   skirmisher: "skirmisher"
 };
 
@@ -117,5 +118,37 @@ export function registerBreakTests() {
     for (const button of html.querySelectorAll(".axona-break-test button[data-attack]")) {
       button.addEventListener("click", () => rollMessageBreakTest(message, button.dataset.attack));
     }
+    const valiant = html.querySelector(".axona-break-test button[data-valiant]");
+    if (valiant) setupValiantButton(message, valiant);
+  });
+}
+
+// Valiant works once per battle. The button only switches the talent off; the reroll itself is done by hand.
+function setupValiantButton(message, button) {
+  const { actorUuid } = message.getFlag(MODULE_ID, "breakTest");
+  const isUsed = actor => getUnit(actor)?.talentActive?.valiant === false;
+  const markUsed = () => {
+    button.disabled = true;
+    button.textContent = "Valiant Reroll Used";
+  };
+  try {
+    if (isUsed(fromUuidSync(actorUuid))) markUsed();
+  } catch (error) {
+    // The unit may not be loaded; the click handler checks again.
+  }
+  button.addEventListener("click", async () => {
+    const actor = await fromUuid(actorUuid);
+    if (!actor) {
+      ui.notifications.warn("The unit for this break test no longer exists.");
+      return;
+    }
+    if (!actor.testUserPermission(game.user, "OWNER")) {
+      ui.notifications.warn("You must own this unit to use its Valiant reroll.");
+      return;
+    }
+    if (!isUsed(actor)) {
+      await actor.update({ [`flags.${MODULE_ID}.unit.talentActive.valiant`]: false });
+    }
+    markUsed();
   });
 }

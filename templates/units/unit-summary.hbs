@@ -1,13 +1,18 @@
 <div class="axona-parchment">
 <div class="axona-frame axona-unit-summary">
-  <header class="axona-header">
+  <header class="axona-header{{#unless document.isToken}} axona-header-standalone{{/unless}}">
     <div class="axona-portrait-stack">
       <div class="axona-unit-portrait">
         <img src="{{document.img}}" alt="" data-edit="img" data-action="editImage">
       </div>
       <div class="axona-hp-under-portrait">
-        <div class="axona-resource-bar axona-hp-bar" role="progressbar" aria-label="HP" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{hpPercent}}">
-          <span style="width: {{hpPercent}}%; background: {{hpColor}}"></span>
+        <div class="axona-hp-bar-box">
+          <div class="axona-resource-bar axona-hp-bar" role="progressbar" aria-label="HP" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{hpPercent}}">
+            <span style="width: {{hpPercent}}%; background: {{hpColor}}"></span>
+          </div>
+        </div>
+        <div class="axona-hp-current-box">
+          <input class="axona-hp-current" id="axona-hp-{{document.id}}" type="number" name="flags.axona.unit.hp.value" value="{{unit.hp.value}}" min="0" max="{{maxHp}}" step="1" data-dtype="Number" aria-label="Current HP" {{#unless editable}}disabled{{/unless}}>
         </div>
       </div>
     </div>
@@ -16,10 +21,12 @@
 
   {{#if document.isToken}}
   <div class="axona-division-field">
-    <button type="button" class="axona-vital{{#if unit.vital}} active{{/if}}" data-action="toggleVital" aria-pressed="{{#if unit.vital}}true{{else}}false{{/if}}" aria-label="Vital" title="Vital" {{#unless editable}}disabled{{/unless}}></button>
     <div class="axona-unit-division-info">
       <span title="{{tokenDivisionName}}">{{tokenDivisionName}}</span>
       {{#if tokenDivisionCommander}}<span class="axona-unit-division-commander" title="{{tokenDivisionCommander}}">{{tokenDivisionCommander}}</span>{{/if}}
+    </div>
+    <div class="axona-vital-box">
+      <button type="button" class="axona-vital{{#if unit.vital}} active{{/if}}" data-action="toggleVital" aria-pressed="{{#if unit.vital}}true{{else}}false{{/if}}" aria-label="Vital" title="Vital" {{#unless editable}}disabled{{/unless}}></button>
     </div>
     {{#if tokenDivisionImg}}<span class="axona-division-frame"><img class="axona-division-icon" src="{{tokenDivisionImg}}" alt=""></span>{{/if}}
   </div>
@@ -40,48 +47,48 @@
   </section>
 
   <section class="axona-block">
-    <div class="axona-resources">
-      {{#if unit.usesMagic}}
-      <div class="axona-resource">
-        <label for="axona-mp-{{document.id}}">MP</label>
-        <input id="axona-mp-{{document.id}}" type="number" name="flags.axona.unit.mp.value" value="{{unit.mp.value}}" min="0" step="1" data-dtype="Number" {{#unless editable}}disabled{{/unless}}>
-        <span>/</span>
-        <input type="number" name="flags.axona.unit.mp.max" value="{{unit.mp.max}}" min="0" step="1" data-dtype="Number" aria-label="Maximum MP" {{#unless editable}}disabled{{/unless}}>
-        <div class="axona-resource-bar axona-mp-bar" role="progressbar" aria-label="MP" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{mpPercent}}">
-          <span style="width: {{mpPercent}}%"></span>
-        </div>
-      </div>
-      {{/if}}
-    </div>
-    <section class="axona-battle-box">
-      <h3>Battle Stats</h3>
-      <div class="axona-battle-row">
-        <div class="axona-stats">
-          {{#each stats}}
-          <label class="axona-stat" title="{{label}}">
-            <span>{{#if sheetLabel}}{{sheetLabel}}{{else}}{{label}}{{/if}}</span>
-            <span class="axona-stat-field">
-              <input type="number" name="flags.axona.unit.battle.{{key}}" value="{{value}}" min="{{min}}" step="1" data-dtype="Number" aria-label="{{label}}" {{#unless ../editable}}disabled{{/unless}}>
-              {{#if suffix}}<span class="axona-suffix">{{suffix}}</span>{{/if}}
-            </span>
-          </label>
-          {{/each}}
-        </div>
-        <div class="axona-battle-hp">
-          <div class="axona-battle-hp-values">
-            <label for="axona-hp-{{document.id}}">HP</label>
-            <div class="axona-battle-hp-fields">
-              <span class="axona-stat axona-stat-field">
-                <input id="axona-hp-{{document.id}}" type="number" name="flags.axona.unit.hp.value" value="{{unit.hp.value}}" min="0" max="{{maxHp}}" step="1" data-dtype="Number" {{#unless editable}}disabled{{/unless}}>
+    <div class="axona-battle-line">
+      <section class="axona-battle-box">
+        <h3>Battle Stats</h3>
+        <div class="axona-battle-row">
+          <div class="axona-stats">
+            {{#each stats}}
+            <label class="axona-stat" title="{{label}}">
+              <span>{{#if sheetLabel}}{{sheetLabel}}{{else}}{{label}}{{/if}}</span>
+              <span class="axona-stat-field">
+                <input type="number" name="flags.axona.unit.battle.{{key}}" value="{{value}}" min="{{min}}" step="1" data-dtype="Number" aria-label="{{label}}" {{#unless ../editable}}disabled{{/unless}}>
+                {{#if suffix}}<span class="axona-suffix">{{suffix}}</span>{{/if}}
               </span>
-              <span class="axona-stat axona-stat-field" title="Maximum HP">
-                <output class="axona-max-hp" aria-label="Maximum HP">{{maxHp}}</output>
+            </label>
+            {{/each}}
+          </div>
+        </div>
+      </section>
+      <div class="axona-move-group">
+        <div class="axona-move-box">
+          <h3>Movement</h3>
+          <div class="axona-move-row">
+            <label class="axona-stat" title="Movement">
+              <span>Move</span>
+              <span class="axona-stat-field">
+                <input type="number" name="flags.axona.unit.movement" value="{{movement}}" min="0" step="1" data-dtype="Number" aria-label="Movement" {{#unless editable}}disabled{{/unless}}>
+              </span>
+            </label>
+            <div class="axona-stat" title="Maximum movement">
+              <span>Max</span>
+              <span class="axona-stat-field">
+                <output>{{maxMovement}}</output>
               </span>
             </div>
           </div>
         </div>
       </div>
-    </section>
+      {{#if unit.usesMagic}}
+      <div class="axona-resource-bar axona-vbar axona-mp-vbar" role="progressbar" title="MP {{unit.mp.value}} / {{unit.mp.max}}" aria-label="MP" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{mpPercent}}">
+        <span style="height: {{mpPercent}}%"></span>
+      </div>
+      {{/if}}
+    </div>
   </section>
 </div>
 </div>

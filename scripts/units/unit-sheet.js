@@ -77,14 +77,20 @@ export class ArmyUnitSheet extends foundry.applications.api.HandlebarsApplicatio
       .filter(condition => !condition.setting || unit[condition.setting])
       .map(condition => ({ ...condition, active: unit[condition.key] }));
     const selectedTalents = Array.isArray(unit.talents) ? unit.talents : [];
+    const talentTiers = unit.talentTiers ?? {};
+    const talentActive = unit.talentActive ?? {};
     const choices = UNIT_TALENTS.map(talent => ({
       ...talent,
-      selected: selectedTalents.includes(talent.key)
+      selected: selectedTalents.includes(talent.key),
+      active: talentActive[talent.key] !== false,
+      tier: Math.max(1, Math.floor(Number(talentTiers[talent.key])) || 1)
     }));
     context.talents = choices.filter(talent => talent.type !== "stance" && talent.category !== "weapon");
     context.weapons = choices.filter(talent => talent.type !== "stance" && talent.category === "weapon");
     context.stances = choices.filter(talent => talent.type === "stance");
-    context.selectedTalents = context.talents.filter(talent => talent.selected);
+    context.selectedTalents = context.talents
+      .filter(talent => talent.selected)
+      .map(talent => talent.tiered ? { ...talent, label: `${talent.label} (${talent.tier})` } : talent);
     context.selectedWeapons = context.weapons.filter(weapon => weapon.selected);
     context.selectedStances = context.stances
       .filter(stance => stance.selected)
@@ -92,6 +98,8 @@ export class ArmyUnitSheet extends foundry.applications.api.HandlebarsApplicatio
     context.activeStance = context.selectedStances.find(stance => stance.active);
     context.inactiveStances = context.selectedStances.filter(stance => !stance.active);
     context.stats = STATS.map(s => ({ ...s, value: unit.battle[s.key] ?? s.initial }));
+    context.movement = unit.movement;
+    context.maxMovement = Number(unit.movement) * 3;
     context.flagsJson = JSON.stringify(
       this.document.flags[MODULE_ID] ?? {},
       null,
@@ -136,6 +144,13 @@ export class ArmyUnitSheet extends foundry.applications.api.HandlebarsApplicatio
           label: "View",
           icon: "fa-solid fa-eye",
           onClick: (event, target) => this.#viewTalent(target)
+        },
+        {
+          label: "Toggle Used / Active",
+          icon: "fa-solid fa-rotate",
+          visible: target => this.isEditable && this.#isAssigned(target.dataset.talentKey) &&
+            UNIT_TALENTS.find(talent => talent.key === target.dataset.talentKey)?.type === "once",
+          onClick: (event, target) => this.#toggleTalentActive(target)
         },
         {
           label: "Remove",
@@ -245,6 +260,19 @@ export class ArmyUnitSheet extends foundry.applications.api.HandlebarsApplicatio
         `<p style="margin: 0;">${foundry.utils.escapeHTML(description).replace(/\n/g, "<br>")}</p></div>`,
       ok: { label: "Close" },
       rejectClose: false
+    });
+  }
+
+  async #toggleTalentActive(target) {
+    if (!this.isEditable) {
+      ui.notifications.warn("You do not have permission to edit this unit.");
+      return;
+    }
+    const talent = this.#getTalent(target, true);
+    if (!talent) return;
+    const active = getUnit(this.document).talentActive?.[talent.key] !== false;
+    await this.document.update({
+      [`flags.${MODULE_ID}.unit.talentActive.${talent.key}`]: !active
     });
   }
 

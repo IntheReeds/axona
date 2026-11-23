@@ -44,7 +44,7 @@
           <h3>Talents</h3>
           <div class="axona-selected-talents">
             {{#each selectedTalents}}
-            <button type="button" class="axona-selected-talent" data-talent-key="{{key}}"
+            <button type="button" class="axona-selected-talent{{#unless active}} inactive{{/unless}}" data-talent-key="{{key}}"
               aria-label="{{label}}: open context menu" title="Right-click for options">
               <img class="axona-talent-image" src="{{image}}" alt=""
                 onerror="this.onerror=null;this.src='{{../talentFallbackImage}}';">
@@ -59,7 +59,7 @@
         <h3>Weapons</h3>
         <div class="axona-selected-talents">
           {{#each selectedWeapons}}
-          <button type="button" class="axona-selected-talent" data-talent-key="{{key}}"
+          <button type="button" class="axona-selected-talent{{#unless active}} inactive{{/unless}}" data-talent-key="{{key}}"
             aria-label="{{label}}: open context menu" title="Right-click for options">
             <img class="axona-talent-image" src="{{image}}" alt=""
               onerror="this.onerror=null;this.src='{{../talentFallbackImage}}';">

@@ -32,7 +32,7 @@
         </div>
         <div class="axona-army-units">
           {{#each units}}
-          <div class="axona-army-unit axona-size-{{sizeClass}}" data-unit-id="{{id}}" draggable="{{#if ../../editable}}{{#if ../canEdit}}true{{else}}false{{/if}}{{else}}false{{/if}}">
+          <div class="axona-army-unit axona-size-{{sizeClass}}{{#if subunit}} axona-army-subunit{{/if}}" data-unit-id="{{id}}" draggable="{{#if ../../editable}}{{#if ../canEdit}}true{{else}}false{{/if}}{{else}}false{{/if}}">
             <strong>{{sizeMarker}}</strong>
             
             

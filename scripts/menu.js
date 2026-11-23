@@ -1,5 +1,6 @@
 import { getUnit, makeUnit, removeUnit } from "./units/unit.js";
 import { getDivision, makeDivision, removeDivision } from "./divisions/division.js";
+import { deployDivision, returnDivision } from "./divisions/deploy.js";
 import { getArmy, makeArmy, removeArmy } from "./armies/army.js";
 
 export function registerActorMenu() {
@@ -43,6 +44,18 @@ export function registerActorMenu() {
           return actor.isOwner && !!getDivision(actor);
         },
         onClick: (event, li) => removeDivision(getActor(li))
+      },
+      {
+        label: "Deploy Division to Scene",
+        icon: "fa-solid fa-person-walking-arrow-right",
+        visible: li => game.user.isGM && !!getDivision(getActor(li)),
+        onClick: (event, li) => deployDivision(getActor(li))
+      },
+      {
+        label: "Return Division from Scene",
+        icon: "fa-solid fa-rotate-left",
+        visible: li => game.user.isGM && !!getDivision(getActor(li)),
+        onClick: (event, li) => returnDivision(getActor(li))
       },
       {
         label: "Make Army",

@@ -1,5 +1,5 @@
 import { MODULE_ID, SIZE_MARKERS } from "../constants.js";
-import { getDivision, getDivisionUnitOrder, getPlacedUnits, getTokenDivisionId, sortDivisionUnits } from "../divisions/division.js";
+import { getDivision, getDivisionEntries, getDivisionUnitOrder, getDropParentId, getPlacedUnits, getSubunitParentId, getTokenDivisionId, hasSubunitLinks } from "../divisions/division.js";
 import { getUnit, getMaxHp, getHpColor, resourcePercent, hpBarLength } from "../units/unit.js";
 import { getDivisionArmy } from "./army.js";
 import { getCommander } from "../divisions/commander.js";
@@ -30,26 +30,29 @@ export class ArmySheet extends foundry.applications.api.HandlebarsApplicationMix
   async _prepareContext(options) {
     const context = await super._prepareContext(options);
     const divisions = game.actors.contents.filter(actor => actor.visible && getDivision(actor));
-    const units = getPlacedUnits();
     context.divisions = divisions
       .filter(actor => getDivision(actor).armyId === this.document.id)
-      .map(actor => ({
-        id: actor.id, name: actor.name, img: actor.img, canEdit: actor.isOwner,
-        commanderName: getCommander(actor)?.name ?? "",
-        units: sortDivisionUnits(units.filter(token => getTokenDivisionId(token) === actor.id)
-          .map(token => {
+      .map(actor => {
+        const entries = getDivisionEntries(actor);
+        return {
+          id: actor.id, name: actor.name, img: actor.img, canEdit: actor.isOwner,
+          commanderName: getCommander(actor)?.name ?? "",
+          units: entries.map(entry => {
+            const token = entry.token;
             const unit = getUnit(token.actor);
             const maxHp = getMaxHp(unit);
             return {
-              id: token.uuid, name: token.name, scene: token.parent.name, img: token.texture.src,
+              id: token.uuid, name: token.name, scene: entry.scene, img: token.texture.src,
               sizeMarker: SIZE_MARKERS[unit.unitSize] ?? SIZE_MARKERS.standard,
               sizeClass: SIZE_MARKERS[unit.unitSize] ? unit.unitSize : "standard",
+              subunit: !!entry.parentId,
               hp: unit.hp.value, maxHp, hpPercent: resourcePercent(unit.hp.value, maxHp), hpColor: getHpColor(unit, maxHp),
               usesMagic: unit.usesMagic, mp: unit.mp?.value, maxMp: unit.mp?.max, mpPercent: resourcePercent(unit.mp?.value, unit.mp?.max),
               barLength: hpBarLength(maxHp)
             };
-          }), actor)
-      }))
+          })
+        };
+      })
       .sort((a, b) => a.name.localeCompare(b.name));
     context.availableDivisions = divisions
       .filter(actor => !getDivisionArmy(actor))
@@ -166,13 +169,26 @@ export class ArmySheet extends foundry.applications.api.HandlebarsApplicationMix
         return;
       }
       if (targetId === source.id) return;
+      const divisionChanged = source.divisionId !== destinationId;
+      const parentId = getDropParentId(getDivisionEntries(destination), targetId, hasSubunitLinks(source.id));
+      const children = divisionChanged
+        ? getPlacedUnits().filter(unit => getSubunitParentId(unit) === source.id && getTokenDivisionId(unit) === source.divisionId)
+        : [];
+      const tokenChanges = {};
+      if (divisionChanged) tokenChanges[`flags.${MODULE_ID}.divisionId`] = destinationId;
+      if (getSubunitParentId(token) !== parentId) tokenChanges[`flags.${MODULE_ID}.subunitOf`] = parentId;
+      if ((Object.keys(tokenChanges).length && !token.canUserModify(game.user, "update")) ||
+          children.some(child => !child.canUserModify(game.user, "update"))) {
+        ui.notifications.warn("You cannot move this unit to the selected division.");
+        return;
+      }
       const order = getDivisionUnitOrder(destination, source.id, targetId, after);
       const saved = getDivision(destination).unitOrder;
       if (!Array.isArray(saved) || order.length !== saved.length || order.some((id, i) => id !== saved[i])) {
         const updated = await destination.update({ [`flags.${MODULE_ID}.division.unitOrder`]: order });
         if (!updated) throw new Error("The destination division's order was not saved.");
       }
-      if (source.divisionId !== destinationId) {
+      if (Object.keys(tokenChanges).length) {
         if (!this.isEditable || !sourceDivision.isOwner || !destination.isOwner ||
             getDivision(sourceDivision)?.armyId !== this.document.id ||
             getDivision(destination)?.armyId !== this.document.id ||
@@ -180,8 +196,12 @@ export class ArmySheet extends foundry.applications.api.HandlebarsApplicationMix
             !token.canUserModify(game.user, "update")) {
           throw new Error("The unit or division changed before the move could be completed.");
         }
-        const updated = await token.update({ [`flags.${MODULE_ID}.divisionId`]: destinationId });
-        if (!updated) throw new Error("The unit's division was not changed.");
+        const updated = await token.update(tokenChanges);
+        if (!updated) throw new Error("The unit was not moved.");
+      }
+      for (const child of children) {
+        const updated = await child.update({ [`flags.${MODULE_ID}.divisionId`]: destinationId });
+        if (!updated) throw new Error(`${child.name} was not moved.`);
       }
     } catch (error) {
       console.error("Axona | Failed to move unit in army chart", error);

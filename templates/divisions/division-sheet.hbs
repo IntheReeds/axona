@@ -1,7 +1,12 @@
 <div>
+<div class="axona-division-top">
 <header class="axona-header">
   <img src="{{document.img}}" alt="" data-edit="img" data-action="editImage">
-  <input type="text" name="name" value="{{document.name}}" placeholder="Division name" {{#unless editable}}disabled{{/unless}}>
+  <div class="axona-division-title">
+    <input type="text" name="name" value="{{document.name}}" placeholder="Division name" {{#unless editable}}disabled{{/unless}}>
+    <span class="axona-cohesion">Cohesion: {{vitalReadyCount}}/{{vitalCount}}</span>
+  </div>
+
   {{#if commander}}
   <img class="axona-commander-img" src="{{commander.img}}" alt="{{commander.name}}" draggable="false">
   {{/if}}
@@ -14,10 +19,25 @@
     <span class="axona-commander-name">{{commander.name}}</span>
     {{/if}}
   </div>
+</section>
+</div>
+
+<section class="axona-block">
   <div class="axona-division-members">
-    {{#each members}}
-    <div class="axona-division-member" data-unit-id="{{id}}" role="button" tabindex="0"
+    {{#each rows}}
+    <div class="axona-division-member{{#if shattered}} shattered{{/if}}{{#if subunit}} axona-subunit{{/if}}" data-unit-id="{{id}}"
+      data-parent-id="{{parentId}}" data-has-subunits="{{#if hasSubunits}}true{{else}}false{{/if}}" role="button" tabindex="0"
       draggable="{{#if ../editable}}true{{else}}false{{/if}}" aria-label="Open {{name}}">
+      {{#if hasSubunits}}
+      <button type="button" class="axona-subunit-toggle" data-action="toggleSubunits" data-unit-id="{{id}}"
+        aria-expanded="{{#if collapsed}}false{{else}}true{{/if}}" aria-label="Subunits of {{name}}"
+        title="{{#if collapsed}}Show subunits{{else}}Hide subunits{{/if}}"
+        {{#unless ../editable}}disabled{{/unless}}>
+        <i class="fa-solid {{#if collapsed}}fa-chevron-right{{else}}fa-chevron-down{{/if}}"></i>
+      </button>
+      {{else}}
+      <span class="axona-subunit-slot"></span>
+      {{/if}}
       <div class="axona-division-vbars">
         <div class="axona-vbar axona-hp-vbar" role="progressbar" title="HP {{hp}} / {{maxHp}}"
           aria-label="{{name}} HP" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{hpPercent}}">
@@ -34,7 +54,7 @@
       <span class="axona-division-member-name">{{name}} <strong class="axona-size-marker">{{sizeMarker}}</strong><small>{{scene}}</small></span>
       <button type="button" class="axona-vital{{#if vital}} active{{/if}}" data-action="toggleVital" data-unit-id="{{id}}"
         aria-pressed="{{#if vital}}true{{else}}false{{/if}}" aria-label="Vital: {{name}}" title="Vital"
-        {{#unless ../editable}}disabled{{/unless}} {{#unless canEdit}}disabled{{/unless}}><i class="{{#if vital}}fa-solid{{else}}fa-regular{{/if}} fa-star"></i></button>
+        {{#unless ../editable}}disabled{{/unless}} {{#unless canEdit}}disabled{{/unless}}></button>
     </div>
     {{else}}
     <p>No units assigned.</p>
