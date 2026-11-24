@@ -49,11 +49,11 @@
   <section class="axona-block">
     <div class="axona-battle-line">
       <section class="axona-battle-box">
-        <h3>Battle Stats</h3>
+        <h3>Battle Stats <button type="button" class="axona-can-support{{#if unit.canShoot}} active{{/if}}" data-action="toggleCanShoot" aria-pressed="{{#if unit.canShoot}}true{{else}}false{{/if}}" aria-label="Can shoot" title="Can shoot" {{#unless editable}}disabled{{/unless}}>S</button></h3>
         <div class="axona-battle-row">
           <div class="axona-stats">
             {{#each stats}}
-            <label class="axona-stat" title="{{label}}">
+            <label class="axona-stat{{#if supportActive}} axona-support-active{{/if}}" title="{{label}}">
               <span>{{#if sheetLabel}}{{sheetLabel}}{{else}}{{label}}{{/if}}</span>
               <span class="axona-stat-field">
                 <input type="number" name="flags.axona.unit.battle.{{key}}" value="{{value}}" min="{{min}}" step="1" data-dtype="Number" aria-label="{{label}}" {{#unless ../editable}}disabled{{/unless}}>

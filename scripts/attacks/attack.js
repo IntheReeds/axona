@@ -35,7 +35,8 @@ function attackerCard(token, unit, index) {
     const isRole = ROLE_STATS.includes(stat.key);
     const roleAttr = isRole ? ` data-role-stat="${stat.key}"` : "";
     const selected = stat.key === defaultStat ? " selected" : "";
-    return `<label class="axona-stat${selected}" title="${esc(stat.label)}"${roleAttr}>
+    const supportActive = stat.key === "shortRange" && unit.canShoot ? " axona-support-active" : "";
+    return `<label class="axona-stat${selected}${supportActive}" title="${esc(stat.label)}"${roleAttr}>
       <span>${esc(stat.sheetLabel)}</span>
       <span class="axona-stat-field">
         <input type="number" value="${esc(unit.battle[stat.key] ?? 0)}" disabled tabindex="-1">

@@ -39,7 +39,7 @@ export function createUnitData(battle = {}) {
     usesCloseRanks: false,
     usesMagic: false,
     vital: false,
-    talents: [],
+    canShoot: true,
     talentTiers: {},
     talentActive: {},
     activeStance: null

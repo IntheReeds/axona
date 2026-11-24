@@ -25,7 +25,8 @@ export class ArmyUnitSheet extends foundry.applications.api.HandlebarsApplicatio
     form: { submitOnChange: true },
     actions: {
       toggleStance: ArmyUnitSheet.#onToggleStance,
-      toggleVital: ArmyUnitSheet.#onToggleVital
+      toggleVital: ArmyUnitSheet.#onToggleVital,
+      toggleCanShoot: ArmyUnitSheet.#onToggleCanShoot
     }
   };
 
@@ -97,7 +98,11 @@ export class ArmyUnitSheet extends foundry.applications.api.HandlebarsApplicatio
       .map(stance => ({ ...stance, active: unit.activeStance === stance.key }));
     context.activeStance = context.selectedStances.find(stance => stance.active);
     context.inactiveStances = context.selectedStances.filter(stance => !stance.active);
-    context.stats = STATS.map(s => ({ ...s, value: unit.battle[s.key] ?? s.initial }));
+    context.stats = STATS.map(s => ({
+      ...s,
+      value: unit.battle[s.key] ?? s.initial,
+      supportActive: s.key === "shortRange" && !!unit.canShoot
+    }));
     context.movement = unit.movement;
     context.maxMovement = Number(unit.movement) * 3;
     context.flagsJson = JSON.stringify(
@@ -294,6 +299,14 @@ export class ArmyUnitSheet extends foundry.applications.api.HandlebarsApplicatio
     if (!unit) return;
     await this.document.update({
       [`flags.${MODULE_ID}.unit.vital`]: !unit.vital
+    });
+  }
+
+  static async #onToggleCanShoot(event, target) {
+    const unit = getUnit(this.document);
+    if (!unit) return;
+    await this.document.update({
+      [`flags.${MODULE_ID}.unit.canShoot`]: !unit.canShoot
     });
   }
 
